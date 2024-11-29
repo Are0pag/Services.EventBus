@@ -6,30 +6,23 @@ namespace Scripts.Services.EventBus
 {
     static public class TypeExposer<TBaseModuleType>
     {
-        // где Type - тип подписчика
-        // а List<Type> - типы интерфейсов, унаследованных от IGlobalSubscriber
         static private readonly Dictionary<Type, List<Type>> _cashedSubscriberTypes = new();
-
-        // Осуществляет отбор тех типов интерфейсов, реализующих полученным экземпляром класса, которые необходимы
+        
+        /// <summary>
+        /// Find all types, that derived from TBaseModuleType
+        /// </summary>
         static public List<Type> GetSubscriberTypes(TBaseModuleType globalSubscriber) {
             var type = globalSubscriber.GetType();
-            if (_cashedSubscriberTypes.ContainsKey(type)) 
-                return _cashedSubscriberTypes[type];
+            if (_cashedSubscriberTypes.TryGetValue(type, out var types)) 
+                return types;
 
             var subscriberTypes = type
-                // Так как в функцию отправлена ссылка на экземпляр класса, реализующего заданный в параметрах интерфейс, необходимо получить информацию об этом интерфейсе
-                // В локальную переменную присваивается массив всех интерфейсов, реализующихся данным экземпляром
                 .GetInterfaces()
-                // Перебор полученных типов интерфейсов для поиска необходимого, который в данном случае выспутает тип интерфейса, унаследованного от IGlobalSubscriber
                 .Where(@interface => @interface.GetInterfaces().Contains(typeof(TBaseModuleType)))
                 .ToList();
 
             _cashedSubscriberTypes[type] = subscriberTypes;
             return subscriberTypes;
-        }
-
-        static public void Reset() {
-            _cashedSubscriberTypes.Clear();
         }
     }
 }

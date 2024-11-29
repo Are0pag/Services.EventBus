@@ -17,10 +17,12 @@ namespace Scripts.Services.EventBus
         public void Remove(TSubscriber subscriber) {
             if (Executing) {
                 var subscriberIndex = List.IndexOf(subscriber);
-                if (subscriberIndex >= 0) {
-                    _needsCleanUp = true;
-                    List[subscriberIndex] = null;
-                }
+                
+                if (subscriberIndex < 0) 
+                    return;
+                
+                _needsCleanUp = true;
+                List[subscriberIndex] = null;
             }
             else
                 List.Remove(subscriber);
