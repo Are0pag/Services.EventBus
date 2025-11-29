@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Scripts.Services.EventBus
 {
@@ -6,9 +7,15 @@ namespace Scripts.Services.EventBus
         where TSubscriber : class
     {
         public readonly List<TSubscriber> List = new();
+        public Type InvokerType { get; set; }
         private bool _needsCleanUp;
 
         public bool Executing;
+
+        public void SetInvoker(Type invokerType) {
+            if (invokerType != null) 
+                InvokerType ??= invokerType;
+        }
 
         public void Add(TSubscriber subscriber) {
             List.Add(subscriber);
